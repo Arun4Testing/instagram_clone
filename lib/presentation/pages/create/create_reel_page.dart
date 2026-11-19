@@ -19,7 +19,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../domain/repositories/media_repository.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/feed/feed_bloc.dart';
@@ -158,14 +158,13 @@ Future<void> _pickVideo(PickSource source) async {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors.background,
-          title: const Text('New reel'),
+          title: const Text('New Yapps'),
           actions: [
             TextButton(
               onPressed: _file == null || _sharing ? null : _share,
               child: _sharing
                   ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Share', style: TextStyle(fontSize: 17, color: AppColors.link)),
+                  : const Text('Share', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -175,7 +174,7 @@ Future<void> _pickVideo(PickSource source) async {
             child: AspectRatio(
               aspectRatio: 9 / 14,
               child: Container(
-                decoration: BoxDecoration(color: AppColors.button, borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: context.palette.surfaceAlt, borderRadius: BorderRadius.circular(16)),
                 clipBehavior: Clip.antiAlias,
                 child: _preview(),
               ),

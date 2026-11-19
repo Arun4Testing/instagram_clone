@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../blocs/feed/feed_bloc.dart';
 import '../../navigation/open_post.dart';
 import '../../widgets/post_tile.dart';
@@ -42,7 +43,7 @@ class _ExploreTabState extends State<ExploreTab> {
           _SearchBar(onChanged: (value) => setState(() => _query = value)),
           Expanded(
             child: real.isEmpty && filler == 0
-                ? const Center(child: Text('No results', style: TextStyle(color: Colors.white54)))
+                ? Center(child: Text('No results', style: TextStyle(color: context.palette.muted)))
                 : GridView.builder(
                     padding: EdgeInsets.zero,
                     itemCount: real.length + filler,
@@ -82,7 +83,9 @@ class _SearchBar extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Padding(
         padding: const EdgeInsets.fromLTRB(10, 10, 14, 10),
         child: Row(children: [
           Expanded(
@@ -91,12 +94,12 @@ class _SearchBar extends StatelessWidget {
               style: const TextStyle(fontSize: 18),
               decoration: InputDecoration(
                 hintText: 'Search',
-                hintStyle: const TextStyle(color: Colors.white54),
-                prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                hintStyle: TextStyle(color: p.subtle),
+                prefixIcon: Icon(Icons.search, color: p.muted),
                 filled: true,
-                fillColor: AppColors.button,
+                fillColor: p.surfaceAlt,
                 contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               ),
             ),
           ),
@@ -104,6 +107,7 @@ class _SearchBar extends StatelessWidget {
           const Icon(Icons.bookmark_border, size: 32),
         ]),
       );
+  }
 }
 
 class _ViewCount extends StatelessWidget {
@@ -113,8 +117,9 @@ class _ViewCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(children: [
-        const Icon(Icons.remove_red_eye_outlined, size: 18),
+        const Icon(Icons.remove_red_eye_outlined, size: 18, color: Colors.white, shadows: [Shadow(blurRadius: 4)]),
         const SizedBox(width: 4),
-        Text(text, style: const TextStyle(fontWeight: FontWeight.w600, shadows: [Shadow(blurRadius: 4)])),
+        Text(text,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, shadows: [Shadow(blurRadius: 4)])),
       ]);
 }

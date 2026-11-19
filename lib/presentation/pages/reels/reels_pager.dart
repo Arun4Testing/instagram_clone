@@ -5,8 +5,9 @@
 //           Tracks which page is current and passes `isCurrent` to each
 //           player, so ONLY the visible reel plays (and makes sound); the
 //           neighbour that is pre-loaded while swiping stays paused.
-//           Also draws the Instagram-style overlay: author, caption, like /
-//           comment / share buttons.
+//           Also draws the overlay: author, caption, like / comment / share
+//           buttons. Always rendered with the dark theme (see DarkMediaScope)
+//           because it sits on top of video.
 // Used by : ReelsTab, ReelsViewerPage
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -15,7 +16,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/post.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/feed/feed_bloc.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../widgets/avatar.dart';
+import '../../widgets/dark_media_scope.dart';
 import '../../widgets/reel_player.dart';
 import '../comments/comments_sheet.dart';
 
@@ -40,15 +43,17 @@ class _ReelsPagerState extends State<ReelsPager> {
   }
 
   @override
-  Widget build(BuildContext context) => PageView.builder(
-        controller: _controller,
-        scrollDirection: Axis.vertical,
-        itemCount: widget.posts.length,
-        onPageChanged: (index) => setState(() => _current = index),
-        itemBuilder: (_, index) => _ReelItem(
-          key: ValueKey(widget.posts[index].id),
-          post: widget.posts[index],
-          isCurrent: index == _current,
+  Widget build(BuildContext context) => DarkMediaScope(
+        child: PageView.builder(
+          controller: _controller,
+          scrollDirection: Axis.vertical,
+          itemCount: widget.posts.length,
+          onPageChanged: (index) => setState(() => _current = index),
+          itemBuilder: (_, index) => _ReelItem(
+            key: ValueKey(widget.posts[index].id),
+            post: widget.posts[index],
+            isCurrent: index == _current,
+          ),
         ),
       );
 }
@@ -111,7 +116,7 @@ class _ReelItem extends StatelessWidget {
           _ActionButton(
             icon: liked ? Icons.favorite : Icons.favorite_border,
             label: '${post.likes.length}',
-            color: liked ? Colors.redAccent : Colors.white,
+            color: liked ? context.palette.accent : Colors.white,
             onPressed: () => bloc.add(LikeToggled(postId: post.id, username: me)),
           ),
           _ActionButton(

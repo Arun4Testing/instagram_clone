@@ -1,9 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // File    : lib/data/datasources/local_storage.dart
 // Layer   : Data (data source)
-// Purpose : The ONLY class that touches SharedPreferences. Stores users, posts
-//           and the current session as JSON strings.
-// Used by : AuthRepositoryImpl, PostRepositoryImpl
+// Purpose : The ONLY class that touches SharedPreferences. Stores users, posts,
+//           the current session and the appearance (theme) choice.
+// Used by : AuthRepositoryImpl, PostRepositoryImpl, ThemeRepositoryImpl
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'dart:convert';
@@ -20,6 +20,7 @@ class LocalStorage {
   static const _usersKey = 'users';
   static const _postsKey = 'posts';
   static const _sessionKey = 'current';
+  static const _themeKey = 'theme_mode';
 
   static Future<LocalStorage> create() async =>
       LocalStorage._(await SharedPreferences.getInstance());
@@ -59,4 +60,9 @@ class LocalStorage {
       await _prefs.setString(_sessionKey, username);
     }
   }
+
+  // ── Theme ──────────────────────────────────────────────────────────────────
+  String? readThemeMode() => _prefs.getString(_themeKey);
+
+  Future<void> writeThemeMode(String value) => _prefs.setString(_themeKey, value);
 }

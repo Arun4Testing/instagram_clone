@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/feed/feed_bloc.dart';
+import '../../widgets/dark_media_scope.dart';
 import 'reels_pager.dart';
 
 class ReelsViewerPage extends StatelessWidget {
@@ -20,7 +21,8 @@ class ReelsViewerPage extends StatelessWidget {
   final String? onlyUser;
 
   @override
-  Widget build(BuildContext context) => SafeArea(
+  Widget build(BuildContext context) => DarkMediaScope(
+    child: SafeArea(
     child: Scaffold(
           backgroundColor: Colors.black,
           body: Stack(children: [
@@ -48,5 +50,6 @@ class ReelsViewerPage extends StatelessWidget {
             ),
           ]),
         ),
+  ),
   );
 }

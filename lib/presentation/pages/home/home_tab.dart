@@ -11,7 +11,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/feed/feed_bloc.dart';
 import '../../widgets/avatar.dart';
@@ -33,15 +34,15 @@ class HomeTab extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(children: [
             IconButton(iconSize: 34, onPressed: () => showCreateSheet(context), icon: const Icon(Icons.add)),
-            const Expanded(
+            Expanded(
               child: Center(
                 child: Text(
                   AppConstants.appName,
-                  style: TextStyle(
+                  style: AppTypography.serif(
                     fontSize: 30,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     fontStyle: FontStyle.italic,
-                    letterSpacing: -1,
+                    letterSpacing: -.5,
                   ),
                 ),
               ),
@@ -57,12 +58,13 @@ class HomeTab extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 children: [
-                  _StoryBubble(user: me, label: 'Your story', isMine: true),
+                  _StoryBubble(user: me, label: 'Your Yapps', isMine: true),
                   for (var k = 0; k < others.length; k++)
                     _StoryBubble(user: others[k], label: others[k], hasRing: k == 0),
                 ],
               ),
             ),
+            const Divider(),
             if (state.isLoading)
               const Padding(padding: EdgeInsets.all(40), child: Center(child: CircularProgressIndicator()))
             else if (state.posts.isEmpty)
@@ -84,7 +86,9 @@ class _StoryBubble extends StatelessWidget {
   final bool isMine;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6),
         child: Column(children: [
           Stack(children: [
@@ -94,8 +98,8 @@ class _StoryBubble extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: isMine ? null : Border.all(color: Colors.white24, width: 2),
+                  borderRadius: BorderRadius.circular(Avatar.cornerFor(74)),
+                  border: isMine ? null : Border.all(color: p.border, width: 2),
                 ),
                 child: Avatar(user, size: 68),
               ),
@@ -107,11 +111,11 @@ class _StoryBubble extends StatelessWidget {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: p.accent,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.background, width: 2),
+                    border: Border.all(color: p.background, width: 2),
                   ),
-                  child: const Icon(Icons.add, size: 18, color: Colors.black),
+                  child: Icon(Icons.add, size: 16, color: p.onAccent),
                 ),
               ),
           ]),
@@ -122,9 +126,10 @@ class _StoryBubble extends StatelessWidget {
               label,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, color: Colors.white70),
+              style: TextStyle(fontSize: 13, color: p.muted),
             ),
           ),
         ]),
       );
+  }
 }

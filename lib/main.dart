@@ -8,6 +8,7 @@
 //     LocalStorage ┐
 //     MediaRepositoryImpl ─► PostRepositoryImpl ─► (as PostRepository) ─► FeedBloc
 //     MediaRepositoryImpl ─► (as MediaRepository) ─► ReelPlayer / CreateReelPage
+//     LocalStorage ─► ThemeRepositoryImpl ─► (as ThemeRepository) ─► ThemeCubit
 //
 //     Everything else depends on the abstract interfaces in lib/domain.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -19,11 +20,14 @@ import 'data/datasources/local_storage.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'data/repositories/media_repository_impl.dart';
 import 'data/repositories/post_repository_impl.dart';
+import 'data/repositories/theme_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/media_repository.dart';
 import 'domain/repositories/post_repository.dart';
+import 'domain/repositories/theme_repository.dart';
 import 'presentation/blocs/auth/auth_bloc.dart';
 import 'presentation/blocs/feed/feed_bloc.dart';
+import 'presentation/blocs/theme/theme_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +35,7 @@ Future<void> main() async {
   final storage = await LocalStorage.create();
   final MediaRepository mediaRepository = MediaRepositoryImpl();
   final AuthRepository authRepository = AuthRepositoryImpl(storage);
+  final ThemeRepository themeRepository = ThemeRepositoryImpl(storage);
   final PostRepository postRepository =
       PostRepositoryImpl(storage, mediaRepository);
 
@@ -49,6 +54,7 @@ Future<void> main() async {
           BlocProvider(
               create: (_) =>
                   FeedBloc(postRepository)..add(const FeedStarted())),
+          BlocProvider(create: (_) => ThemeCubit(themeRepository)),
         ],
         child: const App(),
       ),

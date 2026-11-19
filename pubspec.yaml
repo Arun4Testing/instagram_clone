@@ -1,5 +1,5 @@
-name: instagram_clone
-description: Instagram clone with BLoC and local storage
+name: PicYapper
+description: Pic Yapper with BLoC and local storage
 publish_to: none
 version: 1.0.0+1
 environment:
@@ -22,9 +22,9 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon/instalogo.png"
+  image_path: "assets/icon/pylogo.png"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icon/instalogo.png"
+  adaptive_icon_foreground: "assets/icon/pylogo.png"
 
 dependency_overrides:
   path_provider_android: 2.2.23

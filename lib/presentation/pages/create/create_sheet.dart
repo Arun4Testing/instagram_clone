@@ -7,14 +7,15 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/app_typography.dart';
 import 'create_post_page.dart';
 import 'create_reel_page.dart';
 
-enum _CreateType { reel, edits, post, story, highlights, live }
+enum _CreateType { reel,  post, story }
 
 class _CreateOption {
-  const _CreateOption(this.type, this.icon, this.label, {this.isNew = false});
+  const _CreateOption(this.type, this.icon, this.label) : isNew = false;
 
   final _CreateType type;
   final IconData icon;
@@ -24,31 +25,26 @@ class _CreateOption {
 
 const _options = [
   _CreateOption(_CreateType.reel, Icons.smart_display_outlined, 'Reel'),
-  _CreateOption(_CreateType.edits, Icons.vertical_split_outlined, 'Edits', isNew: true),
   _CreateOption(_CreateType.post, Icons.grid_on, 'Post'),
   _CreateOption(_CreateType.story, Icons.add_circle_outline, 'Story'),
-  _CreateOption(_CreateType.highlights, Icons.favorite_border, 'Highlights'),
-  _CreateOption(_CreateType.live, Icons.sensors, 'Live'),
 ];
 
 void showCreateSheet(BuildContext context) {
   showModalBottomSheet<void>(
     context: context,
-    backgroundColor: AppColors.sheet,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
     builder: (sheetContext) => SafeArea(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         const SizedBox(height: 10),
         Container(
           width: 40,
           height: 4,
-          decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(color: sheetContext.palette.border, borderRadius: BorderRadius.circular(4)),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          child: Text('Create', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Text('Create', style: AppTypography.serif(fontSize: 22, fontWeight: FontWeight.w600)),
         ),
-        const Divider(height: 1, color: Colors.white12),
+        const Divider(),
         for (final option in _options)
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -58,10 +54,10 @@ void showCreateSheet(BuildContext context) {
                 ? Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.accent,
+                      color: sheetContext.palette.accent,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text('New', style: TextStyle(fontSize: 13)),
+                    child: Text('New', style: TextStyle(fontSize: 13, color: sheetContext.palette.onAccent)),
                   )
                 : null,
             onTap: () {

@@ -12,8 +12,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:instagram_clone/presentation/pages/create/create_reel_page.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
+import 'create_reel_page.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/feed/feed_bloc.dart';
 
@@ -90,13 +90,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors.background,
           title: const Text('New post'),
           actions: [
             TextButton(
               onPressed: _bytes == null ? null : _share,
-              child: const Text('Share',
-                  style: TextStyle(fontSize: 17, color: AppColors.link)),
+              child: const Text('Share', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -107,8 +105,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
               aspectRatio: 1,
               child: Container(
                 decoration: BoxDecoration(
-                    color: AppColors.button,
-                    borderRadius: BorderRadius.circular(8)),
+                    color: context.palette.surfaceAlt,
+                    borderRadius: BorderRadius.circular(16)),
                 clipBehavior: Clip.antiAlias,
                 child: _bytes == null
                     ? const Column(

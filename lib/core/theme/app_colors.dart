@@ -1,9 +1,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // File    : lib/core/theme/app_colors.dart
 // Layer   : Core
-// Purpose : Single source of truth for every colour and gradient in the app.
-//           Replaces the old top-level constants (kBg, kSheet, kBtn, ...).
-// Used by : Theme and all presentation widgets/pages
+// Purpose : Colours that do NOT change with light/dark mode: avatar and
+//           placeholder gradients and the "new story" ring. Everything that
+//           does change lives in AppPalette (app_palette.dart).
+// Used by : Avatar, PostImage, ExploreTab
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
@@ -11,31 +12,21 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  static const Color background = Color(0xFF0C1014);
-  static const Color sheet = Color(0xFF1F2023);
-  static const Color button = Color(0xFF262A30);
-  static const Color primary = Color(0xFF0064E0);
-  static const Color accent = Color(0xFF4A5CFF);
-  static const Color accentDisabled = Color(0xFF2B3A8C);
-  static const Color link = Color(0xFF3797F0);
-  static const Color chip = Color(0xFF2A2D33);
-  static const Color splashBackground = Color(0xFF1B1B1B);
-  static const Color authBackground = Color(0xFF1F1F1F);
-
-  /// Gradients used for avatars and for posts that have no picture.
+  /// Muted, earthy gradient pairs for avatars and posts without a picture.
+  /// Mid-tones, so white initials stay readable in both themes.
   static const List<List<Color>> gradients = [
-    [Color(0xFFF6D365), Color(0xFFFDA085)],
-    [Color(0xFF667EEA), Color(0xFF764BA2)],
-    [Color(0xFFFF9A9E), Color(0xFFFAD0C4)],
-    [Color(0xFF43E97B), Color(0xFF38F9D7)],
-    [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-    [Color(0xFFFA709A), Color(0xFFFEE140)],
+    [Color(0xFFD9A066), Color(0xFFB4532F)], // ochre → terracotta
+    [Color(0xFF8FA37C), Color(0xFF5E7A63)], // sage
+    [Color(0xFFC98B9A), Color(0xFF8E4F6B)], // dusty rose → plum
+    [Color(0xFF7FA1B3), Color(0xFF486B84)], // slate blue
+    [Color(0xFFD6B26A), Color(0xFFA7803A)], // mustard
+    [Color(0xFFA78A7A), Color(0xFF6E5246)], // clay
   ];
 
-  /// Instagram-style ring around an avatar with an unseen story.
+  /// Ring around an avatar that has something new.
   static const LinearGradient storyRing = LinearGradient(
     begin: Alignment.bottomLeft,
     end: Alignment.topRight,
-    colors: [Color(0xFFFFC800), Color(0xFFFF0069), Color(0xFFD300C5)],
+    colors: [Color(0xFFD4A24C), Color(0xFFB4532F), Color(0xFF7A3E54)],
   );
 }

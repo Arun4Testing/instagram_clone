@@ -9,9 +9,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../blocs/auth/auth_bloc.dart';
-import '../../widgets/ig_logo.dart';
+import '../../widgets/picyammer_mark.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -35,22 +37,25 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  InputDecoration _decoration(String hint, {Widget? suffixIcon}) =>
-      InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 16),
-        suffixIcon: suffixIcon,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.grey.shade700),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.white54),
-        ),
-      );
+  InputDecoration _decoration(String hint, {Widget? suffixIcon}) {
+    final p = context.palette;
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: p.subtle, fontSize: 16),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: p.surface,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: p.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: p.accent, width: 1.5),
+      ),
+    );
+  }
 
   void _submit() {
     final bloc = context.read<AuthBloc>();
@@ -66,13 +71,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocListener<AuthBloc, AuthState>(
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return BlocListener<AuthBloc, AuthState>(
         listenWhen: (previous, current) =>
             current.error != null && previous.stamp != current.stamp,
         listener: (context, state) => ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(state.error!))),
         child: Scaffold(
-          backgroundColor: AppColors.authBackground,
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, box) => SingleChildScrollView(
@@ -82,17 +88,25 @@ class _LoginPageState extends State<LoginPage> {
                   child: IntrinsicHeight(
                     child: Column(children: [
                       const SizedBox(height: 24),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('English (India)',
-                                style: TextStyle(
-                                    color: Colors.grey.shade400, fontSize: 15)),
-                            Icon(Icons.keyboard_arrow_down,
-                                color: Colors.grey.shade400),
-                          ]),
+                    
                       const Spacer(),
-                      const IgLogo(62),
+                      const PicYapper(62),
+                      const SizedBox(height: 14),
+                      Text(
+                        AppConstants.appName,
+                        style: AppTypography.serif(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w600,
+                            fontStyle: FontStyle.italic),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        AppConstants.tagline,
+                        style: AppTypography.serif(
+                            fontSize: 15,
+                            fontStyle: FontStyle.italic,
+                            color: p.muted),
+                      ),
                       const Spacer(flex: 2),
                       if (_isSignUp) ...[
                         TextField(
@@ -119,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                                 _hidePassword
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
-                                color: Colors.grey.shade400,
+                                color: p.muted,
                               ),
                               onPressed: () => setState(
                                   () => _hidePassword = !_hidePassword),
@@ -133,8 +147,10 @@ class _LoginPageState extends State<LoginPage> {
                         height: 54,
                         child: FilledButton(
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: const StadiumBorder(),
+                            backgroundColor: p.accent,
+                            foregroundColor: p.onAccent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                           ),
                           onPressed: _submit,
                           child: Text(
@@ -156,8 +172,9 @@ class _LoginPageState extends State<LoginPage> {
                         height: 54,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            shape: const StadiumBorder(),
-                            side: const BorderSide(color: AppColors.link),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                            side: BorderSide(color: p.link),
                           ),
                           onPressed: () =>
                               setState(() => _isSignUp = !_isSignUp),
@@ -165,15 +182,11 @@ class _LoginPageState extends State<LoginPage> {
                             _isSignUp
                                 ? 'I already have an account'
                                 : 'Create new account',
-                            style: const TextStyle(
-                                color: AppColors.link, fontSize: 18),
+                            style: TextStyle(color: p.link, fontSize: 18),
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text('∞ Meta',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500)),
                       const SizedBox(height: 12),
                     ]),
                   ),
@@ -183,4 +196,5 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       );
+  }
 }

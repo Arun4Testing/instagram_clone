@@ -12,7 +12,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/avatar.dart';
 import '../explore/explore_tab.dart';
@@ -30,14 +30,12 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   static const _profileIndex = 4;
 
-  // [outlined, filled] icon per bottom-bar slot 0..3 (slot 4 is the avatar).
-  static const _navIcons = [
-    [Icons.home_outlined, Icons.home_filled],
-    [Icons.smart_display_outlined, Icons.smart_display],
-    [Icons.send_outlined, Icons.send],
-    [Icons.search, Icons.search],
-  ];
-
+static const _navIcons = [
+  [Icons.dynamic_feed_outlined, Icons.dynamic_feed],     // 0: Feed / Streams
+  [Icons.play_circle_outline, Icons.play_circle],        // 1: Video / Clips
+  [Icons.chat_bubble_outline, Icons.chat_bubble],        // 2: Messages / Chat
+  [Icons.explore_outlined, Icons.explore],               // 3: Discover / Explore
+];
   static const _tabs = <Widget>[
     HomeTab(),
     ReelsTab(),
@@ -51,6 +49,7 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     final me = context.select((AuthBloc bloc) => bloc.state.user?.username ?? '');
+    final p = context.palette;
 
     return Scaffold(
       body: SafeArea(
@@ -63,9 +62,9 @@ class _AppShellState extends State<AppShell> {
         ),
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.background,
-          border: Border(top: BorderSide(color: Colors.white12, width: .5)),
+        decoration: BoxDecoration(
+          color: p.background,
+          border: Border(top: BorderSide(color: p.border, width: .5)),
         ),
         child: SafeArea(
           top: false,
@@ -77,7 +76,7 @@ class _AppShellState extends State<AppShell> {
                   child: IconButton(
                     iconSize: 28,
                     onPressed: () => setState(() => _index = k),
-                    icon: Icon(_navIcons[k][_index == k ? 1 : 0], color: Colors.white),
+                    icon: Icon(_navIcons[k][_index == k ? 1 : 0], color: _index == k ? p.text : p.muted),
                   ),
                 ),
               Expanded(
@@ -88,9 +87,9 @@ class _AppShellState extends State<AppShell> {
                     child: Container(
                       padding: const EdgeInsets.all(1.5),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(Avatar.cornerFor(34)),
                         border: Border.all(
-                          color: _index == _profileIndex ? Colors.white : Colors.transparent,
+                          color: _index == _profileIndex ? p.text : Colors.transparent,
                           width: 1.5,
                         ),
                       ),
@@ -114,5 +113,5 @@ class _ComingSoonTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Center(child: Text('$title coming soon', style: const TextStyle(color: Colors.white54)));
+      Center(child: Text('$title coming soon', style: TextStyle(color: context.palette.muted)));
 }

@@ -8,7 +8,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/time_ago.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/feed/feed_bloc.dart';
@@ -19,7 +20,6 @@ void showCommentsSheet(BuildContext context, int postId) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: AppColors.sheet,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
     builder: (_) => SafeArea(child: _CommentsSheet(postId: postId, me: me)),
   );
@@ -56,6 +56,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    final p = context.palette;
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SizedBox(
@@ -71,20 +72,20 @@ class _CommentsSheetState extends State<_CommentsSheet> {
             Container(
               width: 40,
               height: 4,
-              decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(color: p.border, borderRadius: BorderRadius.circular(4)),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Text('Comments', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text('Comments', style: AppTypography.serif(fontSize: 20, fontWeight: FontWeight.w600)),
             ),
-            const Divider(height: 1, color: Colors.white12),
+            const Divider(),
             Expanded(
               child: post.comments.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'No comments yet.\nStart the conversation.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white54),
+                        style: TextStyle(color: p.muted),
                       ),
                     )
                   : ListView.builder(
@@ -103,19 +104,19 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                                   TextSpan(text: comment.user, style: const TextStyle(fontWeight: FontWeight.w700)),
                                   TextSpan(
                                     text: '  ${shortAgo(comment.timestamp)}',
-                                    style: const TextStyle(color: Colors.white54),
+                                    style: TextStyle(color: p.muted),
                                   ),
                                 ])),
                                 const SizedBox(height: 2),
-                                Text(comment.text, style: const TextStyle(fontSize: 16)),
+                                Text(comment.text, style: AppTypography.serif(fontSize: 16, height: 1.3)),
                                 const SizedBox(height: 4),
-                                const Text(
+                                Text(
                                   'Reply',
-                                  style: TextStyle(color: Colors.white54, fontWeight: FontWeight.w600),
+                                  style: TextStyle(color: p.muted, fontWeight: FontWeight.w600),
                                 ),
                               ]),
                             ),
-                            const Icon(Icons.favorite_border, size: 22, color: Colors.white70),
+                            Icon(Icons.favorite_border, size: 22, color: p.muted),
                           ]),
                         );
                       },
@@ -148,7 +149,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
                       hintText: 'Join the conversation…',
-                      hintStyle: const TextStyle(color: Colors.white54),
+                      hintStyle: TextStyle(color: p.subtle),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                       suffixIcon: Padding(
                         padding: const EdgeInsets.all(5),
@@ -157,20 +158,20 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                           child: Container(
                             width: 60,
                             decoration: BoxDecoration(
-                              color: hasText ? AppColors.accent : AppColors.accentDisabled,
+                              color: hasText ? p.accent : p.accentDisabled,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Icon(Icons.arrow_upward, size: 26),
+                            child: Icon(Icons.arrow_upward, size: 26, color: p.onAccent),
                           ),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.white24),
+                        borderSide: BorderSide(color: p.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.white38),
+                        borderSide: BorderSide(color: p.muted),
                       ),
                     ),
                   ),

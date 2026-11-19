@@ -9,7 +9,10 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'Instagram';
+  static const String appName = 'Pic Yapper';
+
+  /// Shown on the splash and login screens.
+  static const String tagline = 'Stories worth keeping.';
 
   /// How long the splash screen is shown before the auth gate decides.
   static const Duration splashDuration = Duration(milliseconds: 1500);

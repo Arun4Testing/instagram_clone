@@ -3,23 +3,27 @@
 // Layer   : Presentation (page / bottom-nav tab)
 // Purpose : The signed-in user's profile.
 //             * Header  : username, avatar, post count, name, bio
-//             * Actions : Edit profile (dialog), Share, Log out (menu)
+//             * Actions : Edit profile (dialog), Share, Settings sheet
+//                         (Appearance: system / light / dark, and Log out)
 //             * Tabs    : Posts (photos + reels)  |  Reels only  |  others
 //                         (placeholders)
 //             * Grid    : thumbnails only (no video decoders). Tapping a reel
 //                         opens the full-screen viewer limited to this user's
 //                         reels, autoplaying with sound.
-// Dispatches : ProfileUpdated, LoggedOut (AuthBloc)
+// Dispatches : ProfileUpdated, LoggedOut (AuthBloc); setMode (ThemeCubit)
 // Used by : AppShell
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/app_typography.dart';
+import '../../../domain/entities/app_theme_mode.dart';
 import '../../../domain/entities/app_user.dart';
 import '../../../domain/entities/post.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/feed/feed_bloc.dart';
+import '../../blocs/theme/theme_cubit.dart';
 import '../../navigation/open_post.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/post_tile.dart';
@@ -56,7 +60,7 @@ class _ProfileTabState extends State<ProfileTab> {
         _Header(user: user, postCount: mine.length),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-          child: Text(user.bio.isEmpty ? 'Offline' : user.bio, style: const TextStyle(fontSize: 16)),
+          child: Text(user.bio.isEmpty ? 'No bio yet' : user.bio, style: const TextStyle(fontSize: 16)),
         ),
         const _BannerChip(),
         _ActionButtons(user: user),
@@ -82,7 +86,7 @@ class _TopBar extends StatelessWidget {
         child: Row(children: [
           const Icon(Icons.lock_outline, size: 22),
           const SizedBox(width: 8),
-          Text(username, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+          Text(username, style: AppTypography.serif(fontSize: 26, fontWeight: FontWeight.w600)),
           const Icon(Icons.keyboard_arrow_down),
           const Spacer(),
           IconButton(iconSize: 34, onPressed: () => showCreateSheet(context), icon: const Icon(Icons.add)),
@@ -94,17 +98,60 @@ class _TopBar extends StatelessWidget {
     final auth = context.read<AuthBloc>();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.sheet,
       builder: (sheetContext) => SafeArea(
-        child: ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text('Log out'),
-          onTap: () {
+        child: _SettingsSheet(
+          onLogOut: () {
             Navigator.pop(sheetContext);
             auth.add(const LoggedOut());
           },
         ),
       ),
+    );
+  }
+}
+
+/// Bottom sheet opened from the profile menu: appearance + log out.
+class _SettingsSheet extends StatelessWidget {
+  const _SettingsSheet({required this.onLogOut});
+
+  final VoidCallback onLogOut;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Settings', style: AppTypography.serif(fontSize: 24, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 22),
+        Text('Appearance', style: TextStyle(color: p.muted, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 10),
+        BlocBuilder<ThemeCubit, AppThemeMode>(
+          builder: (context, mode) => SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<AppThemeMode>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(
+                    value: AppThemeMode.system, icon: Icon(Icons.brightness_auto_outlined), label: Text('System')),
+                ButtonSegment(
+                    value: AppThemeMode.light, icon: Icon(Icons.light_mode_outlined), label: Text('Light')),
+                ButtonSegment(value: AppThemeMode.dark, icon: Icon(Icons.dark_mode_outlined), label: Text('Dark')),
+              ],
+              selected: {mode},
+              onSelectionChanged: (selection) => context.read<ThemeCubit>().setMode(selection.first),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        const Divider(),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.logout),
+          title: const Text('Log out'),
+          onTap: onLogOut,
+        ),
+      ]),
     );
   }
 }
@@ -116,25 +163,13 @@ class _Header extends StatelessWidget {
   final int postCount;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Padding(
         padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
         child: Row(children: [
           Stack(clipBehavior: Clip.none, children: [
             Avatar(user.username, size: 86),
-            Positioned(
-              top: -24,
-              left: 0,
-              child: Container(
-                width: 64,
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(color: AppColors.chip, borderRadius: BorderRadius.circular(16)),
-                child: const Text(
-                  'Try sharing a song…',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11, color: Colors.white54),
-                ),
-              ),
-            ),
             Positioned(
               right: 0,
               bottom: 0,
@@ -142,18 +177,18 @@ class _Header extends StatelessWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: p.accent,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.background, width: 2),
+                  border: Border.all(color: p.background, width: 2),
                 ),
-                child: const Icon(Icons.add, size: 18, color: Colors.black),
+                child: Icon(Icons.add, size: 16, color: p.onAccent),
               ),
             ),
           ]),
           const SizedBox(width: 22),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(user.displayName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
+              Text(user.displayName, style: AppTypography.serif(fontSize: 19, fontWeight: FontWeight.w600)),
               const SizedBox(height: 10),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 _Stat('$postCount', 'posts'),
@@ -164,6 +199,7 @@ class _Header extends StatelessWidget {
           ),
         ]),
       );
+  }
 }
 
 class _Stat extends StatelessWidget {
@@ -174,8 +210,8 @@ class _Stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        Text(label, style: const TextStyle(fontSize: 16)),
+        Text(value, style: AppTypography.serif(fontSize: 20, fontWeight: FontWeight.w600)),
+        Text(label, style: TextStyle(fontSize: 14, color: context.palette.muted)),
       ]);
 }
 
@@ -183,24 +219,27 @@ class _BannerChip extends StatelessWidget {
   const _BannerChip();
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Padding(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white24),
+              border: Border.all(color: p.border),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.add, size: 18, color: Colors.white70),
-              SizedBox(width: 6),
-              Text('Add banners', style: TextStyle(color: Colors.white70)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.add, size: 18, color: p.muted),
+              const SizedBox(width: 6),
+              Text('Add a link', style: TextStyle(color: p.muted)),
             ]),
           ),
         ),
       );
+  }
 }
 
 class _ActionButtons extends StatelessWidget {
@@ -245,8 +284,8 @@ class _ProfileButton extends StatelessWidget {
         height: 42,
         child: FilledButton(
           style: FilledButton.styleFrom(
-            backgroundColor: AppColors.button,
-            foregroundColor: Colors.white,
+            backgroundColor: context.palette.surfaceAlt,
+            foregroundColor: context.palette.text,
             padding: EdgeInsets.zero,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -266,7 +305,9 @@ class _TabBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => Row(children: [
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Row(children: [
         for (var k = 0; k < icons.length; k++)
           Expanded(
             child: GestureDetector(
@@ -278,16 +319,17 @@ class _TabBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: k == selected ? Colors.white : Colors.white12,
+                      color: k == selected ? p.text : p.border,
                       width: k == selected ? 2 : .5,
                     ),
                   ),
                 ),
-                child: Icon(icons[k], color: k == selected ? Colors.white : Colors.white54),
+                child: Icon(icons[k], color: k == selected ? p.text : p.subtle),
               ),
             ),
           ),
       ]);
+  }
 }
 
 class _Content extends StatelessWidget {
@@ -300,14 +342,14 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (tab >= 2) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 90),
-        child: Center(child: Text('Nothing here yet', style: TextStyle(color: Colors.white54))),
+      return Padding(
+        padding: const EdgeInsets.only(top: 90),
+        child: Center(child: Text('Nothing here yet', style: TextStyle(color: context.palette.muted))),
       );
     }
     if (posts.isEmpty) {
       return _EmptyState(
-        title: tab == 0 ? 'Create your first post' : 'Create your first reel',
+        title: tab == 0 ? 'Create your first post' : 'Create your first yapp',
         subtitle: 'Share your point of view.',
       );
     }
@@ -337,13 +379,12 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(top: 90),
         child: Column(children: [
-          Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
+          Text(title, style: AppTypography.serif(fontSize: 26, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
-          Text(subtitle, style: const TextStyle(fontSize: 18)),
+          Text(subtitle, style: TextStyle(fontSize: 17, color: context.palette.muted)),
           const SizedBox(height: 36),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
@@ -382,7 +423,7 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-        backgroundColor: AppColors.sheet,
+        backgroundColor: context.palette.surface,
         title: const Text('Edit profile'),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           TextField(controller: _name, decoration: const InputDecoration(labelText: 'Name')),
